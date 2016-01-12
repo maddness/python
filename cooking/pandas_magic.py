@@ -5,6 +5,7 @@ Created on Sat Dec 26 22:11:41 2015
 """
 
 import json
+import pandas as pd
 
 from pandas.io.json import json_normalize
 from sklearn.feature_extraction.text import CountVectorizer
@@ -16,8 +17,8 @@ def underscope(line):
 
 # Read data 
 
-#with open('train_small.json') as input:
-with open('train.json') as input:    
+with open('data/train_small.json') as input:
+#with open('data/train.json') as input:    
     data = json.load(input)
 
 df = json_normalize(data, 'ingredients', ['id', 'cuisine'])
@@ -33,9 +34,26 @@ without_singles = df[~df.ingredient.isin(single_ings)]
 without_singles.loc[:,'ingredient'] = without_singles.ingredient.apply(underscope)
 df = without_singles
 
-# Vectors from words
+# Add vectorized column from words
 vectorizer = CountVectorizer(analyzer="word", max_features=5500)
 vectors = vectorizer.fit_transform(df.ingredient).toarray()
 
-print df.columns
+df = df.reset_index(drop=True)
+df['vec'] = pd.Series(list(vectors))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
