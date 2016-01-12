@@ -1,8 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Sat Dec 26 22:11:41 2015
-@author: maddness
-"""
 
 import json
 import pandas as pd
