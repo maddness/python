@@ -2,25 +2,29 @@
 
 import json
 import pandas as pd
+import numpy as np
 
 from pandas.io.json import json_normalize
 
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.ensemble import RandomForestClassifier
-
+from sklearn.cross_validation import train_test_split
 
 def underscope(line):
     return '_'.join(line.split())
-   
+  
+  
 
-# Read data 
-
-with open('data/train_small.json') as input:
-#with open('data/train.json') as input:    
+#with open('data/train_small.json') as input:
+with open('data/train.json') as input:    
     data = json.load(input)
 
-df = json_normalize(data, 'ingredients', ['id', 'cuisine'])
-df.rename(columns = {0: 'ingredient'}, inplace=True)
+data = json_normalize(data, 'ingredients', ['id', 'cuisine'])
+data.rename(columns = {0: 'ingredient'}, inplace=True)
+
+
+# split train set
+df, test = train_test_split(data, test_size = 0.5)
 
 
 # Add cuisine id
@@ -41,21 +45,17 @@ without_singles = df[~df.ingredient.isin(single_ings)]
 
 # Replace spaces with underscopes
 without_singles.loc[:,'ingredient'] = without_singles.ingredient.apply(underscope)
-df = without_singles
+df = without_singles.reset_index(drop=True)
 
 
 # Add vectorized column from words
 vectorizer = CountVectorizer(analyzer="word", max_features=5500)
-vectors = vectorizer.fit_transform(df.ingredient).toarray()
-
-df = df.reset_index(drop=True)
-df['vec'] = pd.Series(list(vectors))
-
+vectors = vectorizer.fit_transform(df.ingredient)
 
 
 # Train model
 forest = RandomForestClassifier(n_estimators=10)
-forest.fit(df.vec.values, df.cuisine_id)
+#forest.fit(vectors, df.cuisine_id)
 
 
 
