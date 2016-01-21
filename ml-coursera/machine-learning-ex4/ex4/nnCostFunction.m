@@ -3,6 +3,7 @@ function [J, grad] = nnCostFunction(nn_params, ...
                                    hidden_layer_size, ...
                                    num_labels, ...
                                    X, y, lambda)
+                               
 %NNCOSTFUNCTION Implements the neural network cost function for a two layer
 %neural network which performs classification
 %   [J grad] = NNCOSTFUNCTON(nn_params, hidden_layer_size, num_labels, ...
@@ -62,7 +63,8 @@ end;
 A = -log(A3) .* Y;
 B = -log(1 - A3) .* (1 - Y);
 
-J = (sum(A(:)) + sum(B(:))) / m;
+J = (sum(A(:)) + sum(B(:))) / m; 
+
 
 % Part 2: Implement the backpropagation algorithm to compute the gradients
 %         Theta1_grad and Theta2_grad. You should return the partial derivatives of
@@ -79,6 +81,8 @@ J = (sum(A(:)) + sum(B(:))) / m;
 %               over the training examples if you are implementing it for the 
 %               first time.
 %
+
+
 % Part 3: Implement regularization with the cost function and gradients.
 %
 %         Hint: You can implement this around the code for
@@ -87,14 +91,13 @@ J = (sum(A(:)) + sum(B(:))) / m;
 %               and Theta2_grad from Part 2.
 %
 
+Theta1(:, 1) = [];
+Theta2(:, 1) = [];
 
+Theta1_squared = Theta1.^2;
+Theta2_squared = Theta2.^2;
 
-
-
-
-
-
-
+J = J + lambda * (sum(Theta1_squared(:)) + sum(Theta2_squared(:))) / (2*m);
 
 
 
