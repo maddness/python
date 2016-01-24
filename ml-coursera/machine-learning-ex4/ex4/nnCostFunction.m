@@ -25,7 +25,7 @@ Theta2 = reshape(nn_params((1 + (hidden_layer_size * (input_layer_size + 1))):en
 
 % Setup some useful variables
 m = size(X, 1);
-         
+ 
 % You need to return the following variables correctly 
 Theta1_grad = zeros(size(Theta1));
 Theta2_grad = zeros(size(Theta2));
@@ -53,13 +53,10 @@ A3 = sigmoid(Theta2 * A2);
 A3 = A3';
 
 % A3        - 5000 x 10
-Y = zeros(size(A3));
-for i = 1:m
-    Y(i,y(i)) = 1;
-end;    
+eye_matrix = eye(num_labels);
+Y = eye_matrix(y,:);  
 
 % Y         - 5000 x 10
-
 A = -log(A3) .* Y;
 B = -log(1 - A3) .* (1 - Y);
 
@@ -82,6 +79,24 @@ J = (sum(A(:)) + sum(B(:))) / m;
 %               first time.
 %
 
+% Theta1    - 25 x 401
+% Theta2    - 10 x 26
+% Y - 5000 x 10
+
+a1 = X';                            % 401 x 5000
+z2 = Theta1 * a1;                   % 25 x 5000
+a2 = [ones(1, m); sigmoid(z2)];     % 26 x 5000
+   
+a3 = sigmoid(Theta2 * a2);   % 10 x 5000
+delta3 = a3 - Y';            % 10 x 5000
+    
+delta2 = (Theta2(:,2:end)' * delta3) .* sigmoidGradient(z2);   % 25 x 5000
+    
+Theta1_grad = delta2 * a1';
+Theta2_grad = delta3 * a2';
+   
+Theta1_grad = Theta1_grad / m;
+Theta2_grad = Theta2_grad / m;
 
 % Part 3: Implement regularization with the cost function and gradients.
 %
@@ -99,14 +114,8 @@ Theta2_squared = Theta2.^2;
 
 J = J + lambda * (sum(Theta1_squared(:)) + sum(Theta2_squared(:))) / (2*m);
 
-
-
-
-
-
-
-
-
+Theta1_grad(:,2:end) = Theta1_grad(:,2:end) + Theta1 * lambda / m;
+Theta2_grad(:,2:end) = Theta2_grad(:,2:end) + Theta2 * lambda / m;
 
 
 % -------------------------------------------------------------
